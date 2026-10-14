@@ -102,6 +102,9 @@ EXAMPLE_CONFIG = {
     },
     "accounts": [
         {"label": "账号1", "username": "在此填寫賬號(學生號或手機號)", "password": "在此填寫密碼", "enabled": True},
+        # 多人各收各的提醒示例：賬號裡的 notify 會覆蓋全局同名配置（見 README）
+        # {"label": "账号2", "username": "...", "password": "...", "enabled": True,
+        #  "notify": {"serverchan_sendkey": "這位家長自己的SendKey"}},
         {"label": "账号2", "username": "", "password": "", "enabled": True},
     ],
 }
@@ -680,6 +683,13 @@ def check_account(acc: dict, cfg: dict, st: dict, notify) -> dict:
         "label": label, "name": "", "role": "", "status": "ok", "error": "",
         "homeworks": [], "checked_at": time.time(),
     }
+    # 賬號級通知渠道覆蓋：多賬號場景下，讓不同賬號的提醒發到不同人的微信
+    # （如各自自己的 Server酱 SendKey / WxPusher UID；未覆蓋的鍵沿用全局配置）
+    acc_notify = acc.get("notify")
+    if isinstance(acc_notify, dict) and acc_notify:
+        merged = dict(cfg.get("notify") or {})
+        merged.update(acc_notify)
+        notify = make_notifier(merged)
     if acc.get("enabled") is False:
         res["status"] = "disabled"
         return res

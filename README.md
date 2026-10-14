@@ -52,6 +52,31 @@
 
 配置後運行 `python monitor.py --notify-test`，所有已配置渠道會同時收到測試消息。
 
+### 多個孩子，各種提醒發到各個家長的微信
+
+兩種方式（可混用）：
+
+**方式一：企業微信機器人（推薦，全自動對應）**
+每位家長用自己微信掃「微信插件」二維碼後，各自發 `綁定 賬號 密碼`，
+系統自動把賬號綁定到發消息的人，之後提醒只發給綁定者本人。
+
+**方式二：每人一個推送 Key（免註冊企業微信）**
+每位家長用自己的微信掃碼拿各自的 [Server酱](https://sct.ftqq.com) SendKey
+（或 WxPusher UID），填在**對應賬號的 `notify` 覆蓋**裡：
+
+```json
+"accounts": [
+    {"label": "小明", "username": "賬號A", "password": "···", "enabled": true,
+     "notify": {"serverchan_sendkey": "媽媽的SendKey"}},
+    {"label": "小紅", "username": "賬號B", "password": "···", "enabled": true,
+     "notify": {"wxpusher_app_token": "共同的token", "wxpusher_uids": ["爸爸的UID"]}}
+]
+```
+
+規則：賬號裡的 `notify` 會**覆蓋全局同名配置**（可只覆蓋部分鍵），
+沒寫 `notify` 的賬號沿用全局渠道。檢測間隔、重複提醒節奏等同理支持賬號級設置
+（`check_interval_minutes`、`remind_schedule`）。
+
 ## 微信機器人：在微信裡完成一切（進階，推薦服務器部署使用）
 
 > 原理：借助「企業微信自建應用 + 微信插件」。**家長全程只用個人微信**——
