@@ -1357,7 +1357,8 @@ def make_bot_context() -> dict:
                          f"  狀態：{status}｜未完成：{n} 項｜間隔：{iv} 分鐘")
         return "\n".join(lines)
 
-    return {"register": register, "login_and_save": login_and_save,
+    return {"base_dir": str(BASE_DIR),
+            "register": register, "login_and_save": login_and_save,
             "import_cookie": import_cookie, "set_interval": set_interval,
             "set_remind": set_remind,
             "unbind": unbind, "check_access": check_access,

@@ -29,6 +29,7 @@ import time
 import traceback
 import xml.etree.ElementTree as ET
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -156,6 +157,15 @@ _CMD_SPLIT = re.compile(r"\s+")
 
 
 class WeComBot:
+    AGREEMENT = (
+        "👋 歡迎使用智學管家！首次使用請先閱讀並同意以下約定：\n\n"
+        "1️⃣ 你發送的智學網賬號密碼僅保存在部署者的服務器本地，僅用於登入智學網查詢作業狀態\n"
+        "2️⃣ 系統只讀取作業/成績信息用於提醒，不會提交或修改任何數據\n"
+        "3️⃣ 催提醒消息僅發送給你本人，請勿將收到的憑證信息轉發他人\n"
+        "4️⃣ 如不再使用，可隨時發送「解綁」清除賬號密碼\n\n"
+        "回覆「同意」開始使用"
+    )
+
     def __init__(self, bot_cfg: dict, ctx: dict):
         self.cfg = bot_cfg
         self.ctx = ctx
@@ -167,6 +177,34 @@ class WeComBot:
         self.admins = set(bot_cfg.get("admins") or [])
         self._seen_msgids: list[str] = []
         self._lock = threading.Lock()
+        base_dir = ctx.get("base_dir")
+        self.users_path = (Path(base_dir) / "data" / "wecom_users.json") if base_dir \
+            else Path("data") / "wecom_users.json"
+        self._agreed = self._load_users()
+
+    # ---------- 用戶協議狀態（持久化） ----------
+
+    def _load_users(self) -> dict:
+        try:
+            data = json.loads(self.users_path.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except FileNotFoundError:
+            return {}
+        except Exception as e:
+            self._log("warning", "讀取用戶文件失敗：%s", e)
+            return {}
+
+    def _save_users(self) -> None:
+        try:
+            self.users_path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = self.users_path.with_suffix(".tmp")
+            tmp.write_text(json.dumps(self._agreed, ensure_ascii=False, indent=1), encoding="utf-8")
+            tmp.replace(self.users_path)
+        except Exception as e:
+            self._log("warning", "保存用戶文件失敗：%s", e)
+
+    def _has_agreed(self, user: str) -> bool:
+        return user in self._agreed or user in self.admins
 
     # ---------- 微信回調：驗證 & 消息 ----------
 
@@ -250,6 +288,14 @@ class WeComBot:
         parts = _CMD_SPLIT.split(text.strip())
         if not parts or not parts[0]:
             return HELP_TEXT
+        # 首次使用的用戶需先同意使用約定，之後才能執行指令
+        if not self._has_agreed(user):
+            if parts[0] in ("同意", "同意協議", "同意协议", "agree"):
+                self._agreed[user] = {"agreed_at": time.time()}
+                self._save_users()
+                self._log("info", "用戶 %s 已同意使用約定", user)
+                return "✅ 已同意，開始使用吧！\n\n" + HELP_TEXT
+            return self.AGREEMENT
         cmd = parts[0].lower()
         args = parts[1:]
         is_admin = user in self.admins
