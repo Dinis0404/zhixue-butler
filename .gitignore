@@ -20,3 +20,8 @@ desktop.ini
 
 # 本機工具
 .zcodeignore
+
+# 本地測試工具與運行產物
+tools/
+data/tunnel.log
+data/run.out
