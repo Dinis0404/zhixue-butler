@@ -466,7 +466,14 @@ def start_bot(bot_cfg: dict, ctx: dict, logger=None) -> None:
     try:
         bot = WeComBot(bot_cfg, ctx)
         if bot_cfg.get("secret"):
-            bot.client.access_token()  # 啟動時先驗證 secret 可用
+            # 啟動時驗證 secret；失敗僅警告（回調收發用 token/aes_key，不受影響）
+            try:
+                bot.client.access_token()
+                bot._log("info", "企業微信 secret 驗證通過")
+            except Exception as e:
+                bot._log("warning", "secret 驗證失敗（主動推送將不可用，回調收發不受影響）：%s", e)
+    except SystemExit:
+        raise
     except Exception as e:
         raise SystemExit(f"微信機器人初始化失敗：{e}\n請檢查 wecom_bot 配置（corpid/secret/agentid/token/aes_key）")
 
