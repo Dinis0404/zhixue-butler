@@ -1,0 +1,4 @@
+zhixuewang>=1.5.1
+playwright>=1.35.0
+requests>=2.31.0
+pycryptodome>=3.19.0

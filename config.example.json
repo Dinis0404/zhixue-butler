@@ -1,0 +1,51 @@
+{
+  "check_interval_minutes": 30,
+  "homework_page_size": 50,
+  "auto_relogin": false,
+  "notify": {
+    "mode": "new_only",
+    "remind_on_first_run": false,
+    "deadline_warn_hours": 24,
+    "remind_schedule": [],
+    "verify_before_send": true,
+    "windows_toast": true,
+    "windows_toast_sound": true,
+    "serverchan_sendkey": "",
+    "pushplus_token": "",
+    "wxpusher_app_token": "",
+    "wxpusher_uids": [],
+    "wxpusher_topic_ids": [],
+    "wecom_webhook": "",
+    "wecom_app_corpid": "",
+    "wecom_app_secret": "",
+    "wecom_app_agentid": 0,
+    "wecom_app_touser": "@all",
+    "dingtalk_webhook": "",
+    "dingtalk_secret": "",
+    "feishu_webhook": "",
+    "email_smtp_host": "",
+    "email_smtp_port": 465,
+    "email_ssl": true,
+    "email_username": "",
+    "email_password": "",
+    "email_to": []
+  },
+  "wecom_bot": {
+    "enabled": false,
+    "corpid": "",
+    "secret": "",
+    "agentid": 0,
+    "callback_token": "",
+    "encoding_aes_key": "",
+    "listen_port": 8080,
+    "admins": []
+  },
+  "accounts": [
+    {
+      "label": "账号1",
+      "username": "学号或手机号",
+      "password": "密码",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+# 隱私文件：絕不能上傳（含賬號密碼 / 登入憑證 / 日誌）
+config.json
+data/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# 系統 / 編輯器
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# 本機工具
+.zcodeignore

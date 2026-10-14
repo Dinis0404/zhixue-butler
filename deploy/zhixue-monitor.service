@@ -1,0 +1,38 @@
+# 智學網作業監控 systemd 服務文件（適配 Ubuntu 24.04）
+#
+# 安裝步驟（Ubuntu 24.04 LTS）：
+#   sudo apt update && sudo apt install -y python3 python3-venv python3-pip
+#   sudo mkdir -p /opt/zhixue-monitor && sudo chown $USER /opt/zhixue-monitor
+#   # 上傳項目文件到 /opt/zhixue-monitor 後：
+#   cd /opt/zhixue-monitor
+#   python3 -m venv .venv
+#   .venv/bin/pip install -r requirements.txt
+#   # 可選：讓機器人「綁定」指令能在服務器上自動登入（約150MB下載）：
+#   .venv/bin/playwright install --with-deps chromium
+#   # 編輯 config.json：填賬號 + 通知渠道（推薦 wecom_app_* 或 wecom_bot）
+#   # 導入憑證：.venv/bin/python monitor.py --import-cookie 账号1 "Cookie字串"
+#
+#   sed -i 's/YOUR_USER/你的用戶名/' /etc/systemd/system/zhixue-monitor.service
+#   sudo cp deploy/zhixue-monitor.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now zhixue-monitor
+#   journalctl -u zhixue-monitor -f        # 看實時日誌
+#
+# 無 root 的替代：cd /opt/zhixue-monitor && nohup .venv/bin/python monitor.py >/dev/null 2>&1 &
+
+[Unit]
+Description=Zhixue Homework Monitor (智學網作業監控)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=YOUR_USER
+WorkingDirectory=/opt/zhixue-monitor
+ExecStart=/opt/zhixue-monitor/.venv/bin/python /opt/zhixue-monitor/monitor.py
+Restart=always
+RestartSec=30
+# 保持上海時區，確保截止時間顯示正確
+Environment=TZ=Asia/Shanghai
+
+[Install]
+WantedBy=multi-user.target
