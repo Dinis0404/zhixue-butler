@@ -211,13 +211,40 @@ journalctl -u zhixue-monitor -f
 
 ## 文件說明
 
+```
+zhixue-butler/
+├── monitor.py                 # 主程序：賬號輪詢、提醒判斷、通知分發、狀態頁
+├── wecom_bot.py               # 微信機器人：回調加解密、指令解析、主動推送
+├── config.json                # 運行配置（含隱私，已被 .gitignore 排除）
+├── config.example.json        # 配置模板：克隆後複製為 config.json 再填
+├── requirements.txt           # Python 依賴
+├── start_monitor.bat          # Win：啟動常駐監控
+├── start_wechat_test.bat      # Win：一鍵啟動監控+公網隧道（微信機器聯調）
+├── login_refresh.bat          # Win：瀏覽器登入/續期所有賬號
+├── import_cookie.bat          # Win：手動導入 Cookie
+├── check_once.bat             # Win：立即檢查一次
+├── open_status.bat            # Win：打開狀態總覽頁
+├── test_notify.bat            # Win：測試桌面彈窗
+├── install_autostart.bat      # Win：開機自啟（uninstall_ 為取消）
+├── setup.bat                  # Win：安裝依賴
+├── deploy/
+│   └── zhixue-monitor.service # Linux systemd 服務文件（Ubuntu 24.04 適配）
+└── data/                      # 運行產物（已被 .gitignore 排除）
+    ├── status.html            # 作業狀態總覽頁
+    ├── logs/monitor.log       # 運行日誌
+    ├── cookies/               # 各賬號登入憑證
+    └── wecom_users.json       # 微信用戶協議狀態
+```
+
 | 文件 | 作用 |
 |---|---|
 | `monitor.py` | 主程序 |
 | `wecom_bot.py` | 微信機器人（回調加解密、指令解析、主動推送） |
 | `config.json` | **配置：賬號 + 渠道 + 機器人 + 提醒規則** |
+| `config.example.json` | 配置模板（新用戶複製為 config.json 後填寫） |
 | `login_refresh.bat` / `import_cookie.bat` | 桌面登入 / 手動導入 Cookie |
 | `start_monitor.bat` / `check_once.bat` | 常駐監控 / 手動檢查一次 |
+| `start_wechat_test.bat` | 本機聯調微信機器人（監控+公網隧道一鍵啟動） |
 | `open_status.bat` / `test_notify.bat` | 打開狀態頁 / 測試桌面彈窗 |
 | `install_autostart.bat` / `uninstall_autostart.bat` | Windows 開機自啟 |
 | `setup.bat` | 重裝 Python 依賴 |
